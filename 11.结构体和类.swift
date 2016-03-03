@@ -5,31 +5,36 @@ import Foundation
 
 
 /*********************************
-* 结构体和类
-*********************************/
+ * 结构体和类
+ *********************************/
 class MyClass {
     var v1 = 1
     var v2 :Int?
     
-    func sayHi(name: String){
-        println("Hi, \(name)")
+    func sayHi(name: String) -> Self {
+        v2 = 2
+        print("Hi, \(name)")
+        return self
     }
 }
 
 struct MyStruct {
     var v1 = 1
-    var v2 :Int? = 2
+    var v2 :Int?
     
-    func sayHi(name: String){
-        println("Hi, \(name)")
+    // 参考后面的 mutating 关键字说明
+    mutating func sayHi(name: String) -> MyStruct {
+        v2 = 2
+        print("Hi, \(name)")
+        return self
     }
 }
 
 var c1 = MyClass()
 var c2 = MyStruct()
 
-c1.sayHi("a")   // Hi, a
-c2.sayHi("b")   // Hi, b
+c1.sayHi("a").v2   // Hi, a // 2
+c2.sayHi("b").v2   // Hi, b // 2
 
 // 可见结构体和类非常类似，结构体可以完成类的绝大多数工作。
 // 区别：
@@ -63,7 +68,7 @@ struct BookStruct {
     }
     
     func description(){
-        println("<\(self):name = \(name), price = \(price), author = \(author)>")
+        print("<\(self):name = \(name), price = \(price), author = \(author)>")
     }
 }
 
@@ -75,6 +80,7 @@ let book2 = BookStruct("Swift", 27.5, "Petter")
 book2.description()
 // <__lldb_expr_1940.BookStruct:name = Swift, price = 27.5, author = Petter>
 
+// 类差不多，略过
 
 
 
@@ -93,6 +99,8 @@ class Circle {
             return 3.1415926
         }
     }
+    // 或者 static let pi = 3.1415926
+    
     
     var diameter :Double{
         set{
@@ -129,10 +137,10 @@ class Circle {
 }
 
 var cir = Circle(2)
-println(cir.area)   // 12.56637
+print(cir.area)   // 12.56637
 cir.diameter = 3
-println(cir.radius) // 1.5
-println(cir.area)   // 7.06858
+print(cir.radius) // 1.5
+print(cir.area)   // 7.06858
 
 
 
@@ -141,10 +149,10 @@ println(cir.area)   // 7.06858
 class A{
     var a :Int = 0{
         willSet{
-            println("a 即将变成 \(newValue)")
+            print("a 即将变成 \(newValue)")
         }
         didSet{
-            println("a 已经变成 \(a)")
+            print("a 已经变成 \(a)")
             // 这里还可以做点什么
             
         }
@@ -180,9 +188,9 @@ struct B{
 }
 
 var sb = B()
-println(sb.a)   // 0
+print(sb.a)   // 0
 sb.doSomthing2()
-println(sb.a)   // 1
+print(sb.a)   // 1
 
 
 // 类方法 在函数前面加class 结构体枚举则加static
@@ -194,7 +202,45 @@ println(sb.a)   // 1
 /*********************************
 * 下标
 *********************************/
-// 略
+// 类和结构体的下标用于返回指定 Index 的值，它的具体行为类似以计算属性
+// 由 get 和 set 方法实现
+
+
+struct Book {
+    var name: String?
+    var author: String?
+    var pages: Int = 0
+    var price: Double = 0.0
+    
+    init() {
+        name = nil
+        author = nil
+        pages = 0
+        price = 0.0
+    }
+    
+    init(aName: String, aAuthor: String, aPages: Int, aPrice: Double) {
+        name = aName
+        author = aAuthor
+        pages = aPages
+        price = aPrice
+    }
+    
+    subscript(inPage: Int) -> Int {
+        return inPage
+    }
+    
+    // 结构体下标里不允许修改属性, 而类的则可以
+    subscript(numbers numbers: UInt, discount discount: Double) -> Double {
+        return price * Double(numbers) * discount
+    }
+}
+
+let book = Book(aName: "Swift", aAuthor: "Some one", aPages: 300, aPrice: 123.99)
+let pageNow = book[47]  // 47
+let totalMoney = book[numbers: 9, discount: 0.79]   // 881.5688999999999
+
+
 
 
 
